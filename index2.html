@@ -1,0 +1,56 @@
+<!-- Smart Agriculture Monitoring System - Static Web Interface with AWS Amplify -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Farm Dashboard</title>
+  <script src="https://unpkg.com/aws-amplify@5.0.4/dist/aws-amplify.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f9f9f9; color: #333; margin: 20px; }
+    h1 { color: #2e8b57; }
+    .card { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    .sensor { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🌾 Smart Farm Monitoring</h1>
+  <div class="card">
+    <p><span class="sensor">Soil Moisture:</span> <span id="moisture">Loading...</span></p>
+    <p><span class="sensor">Temperature:</span> <span id="temperature">Loading...</span></p>
+    <p><span class="sensor">Humidity:</span> <span id="humidity">Loading...</span></p>
+  </div>
+
+  <script>
+    // AWS Amplify Configuration
+    aws_amplify.Amplify.configure({
+      API: {
+        endpoints: [
+          {
+            name: "SmartFarmAPI",
+            endpoint: "https://your-api-id.execute-api.region.amazonaws.com/prod",
+            region: "your-region"
+          }
+        ]
+      }
+    });
+
+    async function fetchSensorData() {
+      try {
+        const apiName = "SmartFarmAPI";
+        const path = "/data";
+        const response = await aws_amplify.API.get(apiName, path);
+        document.getElementById('moisture').innerText = response.soil_moisture + '%';
+        document.getElementById('temperature').innerText = response.temperature + ' °C';
+        document.getElementById('humidity').innerText = response.humidity + ' %';
+      } catch (err) {
+        console.error('Failed to fetch sensor data', err);
+      }
+    }
+
+    fetchSensorData();
+    setInterval(fetchSensorData, 5000); // Refresh every 5 seconds
+  </script>
+</body>
+</html>
+
